@@ -30,7 +30,6 @@
                     <child>
                       <object class="GtkImageMenuItem" id="mi_file_new">
                         <property name="label">gtk-new</property>
-                        <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -43,6 +42,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="_on_open" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -188,10 +188,16 @@
             <property name="can_focus">False</property>
             <property name="shadow_type">in</property>
             <child>
-              <object class="GtkLayout" id="layout">
+              <object class="GtkViewport" id="viewport1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="draw" handler="_on_draw" swapped="no"/>
+                <child>
+                  <object class="GtkDrawingArea" id="drawingarea">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <signal name="draw" handler="_on_draw" swapped="no"/>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
