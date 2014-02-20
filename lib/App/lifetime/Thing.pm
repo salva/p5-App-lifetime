@@ -7,11 +7,12 @@ has name => (is => 'ro');
 
 has events => (is => 'ro', default => sub {[]});
 
-sub add_event {
-    my ($self, %args) = @_;
-    my %event = map { $_ => delete $args{$_} } qw(start end type);
-    %args and die "Internal error: unexpected arguments: " . join(", ", keys %args);
-    push @{$self->events}, \%event;
+use App::lifetime::Thing::Event;
+
+sub add_new_event {
+    my $self = shift;
+    my $event = App::lifetime::Thing::Event->new(@_);
+    push @{$self->events}, $event;
 }
 
 1;
