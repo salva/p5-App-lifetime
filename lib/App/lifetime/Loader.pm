@@ -22,7 +22,7 @@ sub load_from_file {
             return $self->load_from_string($json);
         }
     }
-    throw_io_exception("Unable to read data from '$fn'", err => $!);
+    throw_io_exception(message => "Unable to read data from '$fn'", err => $!);
 }
 
 sub load_from_string {
@@ -33,8 +33,10 @@ sub load_from_string {
         App::lifetime::Loader::Validator->validate($in);
         my $seq = 0;
         for my $entry (@$in) {
+            #use Data::Dumper;
+            #print Dumper $entry
             my $thing = App::lifetime::Thing->new(seq => $seq++,
-                                                  name => $in->{name});
+                                                  name => $entry->{name});
             if (my $events = $entry->{events}) {
                 for my $e (@$events) {
                     $thing->add_new_event(%$e);
@@ -43,7 +45,8 @@ sub load_from_string {
             push @things, $thing;
         };
     };
-    $@ and throw_json_exception("Unable to decode JSON data", err => $@);
+    $@ and throw_json_exception(message => "Unable to decode JSON data: $@", err => $@);
+    @things;
 }
 
 1;

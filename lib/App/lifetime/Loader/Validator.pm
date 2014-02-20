@@ -14,7 +14,7 @@ sub validate {
     my $self = shift;
     my $data = shift;
     match_schema($data, $schema)
-        or throw_json_exception("JSON doesn't match schema");
+        or throw_json_exception(message => "JSON doesn't match schema");
     1;
 }
 
