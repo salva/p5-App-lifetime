@@ -40,14 +40,22 @@ sub _on_open {
     while ($filechooser->run eq 'accept') {
         my $fn = $filechooser->get_filename;
         print "opening $fn\n";
-        last if $self->_load_file($fn);
+        my $universe = eval { $self->_load_file($fn) };
+        if ($universe) {
+            print "new universe loaded\n";
+            $self->{universe} = $universe;
+            $self->_zoom_all;
+            # $self->{drawingarea}->queue_draw;
+            last;
+        }
+        warn "Unable to load file: $@";
     }
     $filechooser->destroy;
 }
 
 sub _load_file {
     my ($self, $fn) = @_;
-    my $data = App::lifetime::Loader->new->load_from_file($fn);
+    App::lifetime::Loader->new->load_from_file($fn);
 }
 
 sub _on_draw {
@@ -56,6 +64,8 @@ sub _on_draw {
     #my $class = ref $cr;
     #    no strict;
     #print STDERR join("\n", keys(%{$class."::"}), "\n");
+
+    print "drawing graph\n";
 
     if (0) {
         my $gdk_window = $drawingarea->get_bin_window;
@@ -69,14 +79,29 @@ sub _on_draw {
         $cr = $gdk_window->cairo_create;
     }
 
-    $cr->rectangle(10, 10, 40, 40);
-    $cr->set_source_rgb(1.0, 0.5, 0.2);
-    $cr->fill;
+    if (my $universe = $self->{universe}) {
+        $self->_draw_universe($universe, $cr);
+    }
+    else {
+        $cr->rectangle(10, 10, 40, 40);
+        $cr->set_source_rgb(1.0, 0.5, 0.2);
+        $cr->fill;
+    }
+}
+
+sub _zoom_all {
+    my $self = shift;
+    my $dpx = $self->{drawingarea}
+}
+
+sub _draw_universe {
+    my ($self, $universe, $cr) = @_;
+    
 }
 
 sub run {
     my $self = shift;
-    $self->{drawingarea}->set_size_request(2000, 2000);
+    #$self->{drawingarea}->set_size_request(2000, 2000);
     $self->{window}->show_all();
     Gtk3->main();
 }
