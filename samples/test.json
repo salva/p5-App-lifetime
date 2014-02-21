@@ -1,0 +1,12 @@
+[ { "name"   : "foo",
+    "events" : [ { "start": "1.234",
+                   "type": "one" },
+                 { "start": "2.345",
+                   "type": "two" } ] },
+  { "name"   : "bar",
+    "events" : [ { "start": "1.766",
+                   "type" : "one" },
+                 { "start": "1.900",
+                   "type" : "two" } ] } ]
+                 
+          
