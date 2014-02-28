@@ -5,4 +5,8 @@ use warnings;
 
 use App::lifetime::GUI;
 
-App::lifetime::GUI->new->run;
+my $gui = App::lifetime::GUI->new;
+
+$gui->load(shift @ARGV) if @ARGV;
+
+$gui->run;

@@ -8,6 +8,8 @@ use App::lifetime::Loader;
 use Gtk3 qw(-init);
 use Data::Dumper;
 
+use constant MIN_WIDTH => 120;
+
 sub new {
     my ($class) = @_;
     my $self = {};
@@ -22,6 +24,7 @@ sub new {
     my $window = $self->{window} = $builder->get_object('window');
     $window->set_screen( $window->get_screen() );
 
+    $self->{viewport} = $builder->get_object('viewport');
     $self->{drawingarea} = $builder->get_object('drawingarea');
 
     $self;
@@ -39,18 +42,27 @@ sub _on_open {
 
     while ($filechooser->run eq 'accept') {
         my $fn = $filechooser->get_filename;
-        print "opening $fn\n";
-        my $universe = eval { $self->_load_file($fn) };
-        if ($universe) {
-            print "new universe loaded\n";
-            $self->{universe} = $universe;
+        if ($self->load($fn)) {
             $self->_zoom_all;
             # $self->{drawingarea}->queue_draw;
             last;
         }
-        warn "Unable to load file: $@";
     }
     $filechooser->destroy;
+}
+
+sub load {
+    my ($self, $fn) = @_;
+    print "opening $fn\n";
+    my $universe = eval { $self->_load_file($fn) };
+    if ($universe) {
+        print "new universe loaded\n";
+        $self->{universe} = $universe;
+        # $self->{drawingarea}->queue_draw;
+        return 1;
+    }
+    warn "Unable to load file '$fn': $@";
+    return;
 }
 
 sub _load_file {
@@ -91,18 +103,37 @@ sub _on_draw {
 
 sub _zoom_all {
     my $self = shift;
-    my $dpx = $self->{drawingarea}
+    my $vp = $self->{viewport};
+
+    my $width  = $vp->get_allocated_width();
+    my $height = $vp->get_allocated_height();
+
+    $width = MIN_WIDTH if MIN_WIDTH > $width;
+
+    $self->{drawingarea}->set_size_request($width, $height);
+
+    warn "vp width: $width, height: $height\n";
+
 }
 
 sub _draw_universe {
     my ($self, $universe, $cr) = @_;
-    
+    # $self->_zoom_all;
+
+    my $da = $self->{drawingarea};
+
+    my $width  = $da->get_allocated_width();
+    my $height = $da->get_allocated_height();
+
+    warn "da width: $width, height: $height\n";
+
 }
 
 sub run {
     my $self = shift;
-    #$self->{drawingarea}->set_size_request(2000, 2000);
+    $self->{drawingarea}->set_size_request(2000, 2000);
     $self->{window}->show_all();
+    $self->_zoom_all;
     Gtk3->main();
 }
 
