@@ -111,8 +111,10 @@ sub _zoom_all {
     $width = MIN_WIDTH if MIN_WIDTH > $width;
 
     $self->{drawingarea}->set_size_request($width, $height);
-
     warn "vp width: $width, height: $height\n";
+
+    my $universe = $self->{universe};
+    $self->{scale} = $universe->width / $width;
 
 }
 
